@@ -1,0 +1,55 @@
+# Define a function for simple linear regression
+def simple_linear_regression(X, y):
+    n = len(X)
+    
+    # Calculate mean of X and y
+    mean_X = sum(X) / n
+    mean_y = sum(y) / n
+    
+    # Calculate slope (m) and y-intercept (b) using the formulas
+    numerator = sum((X[i] - mean_X) * (y[i] - mean_y) for i in range(n))
+    denominator = sum((X[i] - mean_X) ** 2 for i in range(n))
+    m = numerator / denominator
+    b = mean_y - m * mean_X
+    
+    return m, b
+
+# Define a function to make predictions
+def predict(X, m, b):
+    return [m * x + b for x in X]
+
+# Generate some random data for demonstration
+import random
+random.seed(0)
+X = [2 * random.random() for _ in range(100)]  # Generate 100 random samples
+y = [4 + 3 * x + random.random() for x in X]  # y = 4 + 3x + noise
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = X[:80], X[80:], y[:80], y[80:]
+
+# Train Linear Regression model
+m, b = simple_linear_regression(X_train, y_train)
+
+# Make predictions on the testing set
+y_pred = predict(X_test, m, b)
+
+# Evaluate the performance of the model
+def mean_absolute_error(y_true, y_pred):
+    return sum(abs(y_true[i] - y_pred[i]) for i in range(len(y_true))) / len(y_true)
+
+def mean_squared_error(y_true, y_pred):
+    return sum((y_true[i] - y_pred[i]) ** 2 for i in range(len(y_true))) / len(y_true)
+
+def r2_score(y_true, y_pred):
+    mean_y_true = sum(y_true) / len(y_true)
+    total_sum_squares = sum((y_true[i] - mean_y_true) ** 2 for i in range(len(y_true)))
+    residual_sum_squares = sum((y_true[i] - y_pred[i]) ** 2 for i in range(len(y_true)))
+    return 1 - (residual_sum_squares / total_sum_squares)
+
+mae = mean_absolute_error(y_test, y_pred)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print("Mean Absolute Error (MAE):", mae)
+print("Mean Squared Error (MSE):", mse)
+print("R-squared (R2) score:", r2)
